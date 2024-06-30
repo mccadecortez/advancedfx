@@ -36,9 +36,9 @@ jobs:
       run: cmake --build . --config Release -v -- -r
 
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v3
       with:
         name: build-Release-latest
-        path: "${{github.workspace}}/build/Release"
+        path: "${{github.workspace}}/build/Release/"
         overwrite: true
         if-no-files-found: error
