@@ -178,6 +178,8 @@ struct AfxHookSource2 {
 
     int (*getEntityRefViewEntityHandle)(void * pRef);
 
+    int (*getDemoTick)();
+
     bool (*isPlayingDemo)();
 
     bool (*isDemoPaused)();
