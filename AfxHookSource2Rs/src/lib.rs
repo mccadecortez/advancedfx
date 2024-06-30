@@ -101,6 +101,8 @@ pub struct AfxHookSource2 {
 
     get_entity_ref_view_entity_handle: unsafe extern "C" fn(p_ref: * mut AfxEntityRef) -> i32,
 
+    get_demo_tick:  unsafe extern "C" fn() -> i32,
+
     is_playing_demo:  unsafe extern "C" fn() -> bool,
 
     is_demo_paused:  unsafe extern "C" fn() -> bool,
@@ -500,6 +502,14 @@ fn afx_get_entity_ref_view_entity_handle(iface: * mut AfxHookSource2, p_ref: * m
     let result: i32;
     unsafe {
         result = ((*iface).get_entity_ref_view_entity_handle)(p_ref);
+    }
+    return result;
+}
+
+fn afx_get_demo_tick(iface: * mut AfxHookSource2,) -> i32 {
+    let result: i32;
+    unsafe {
+        result = ((*iface).get_demo_tick)();
     }
     return result;
 }
@@ -1579,6 +1589,15 @@ fn mirv_load(this: &JsValue, args: &[JsValue], context: &mut Context) -> JsResul
     mirv_error_type()    
 }
 
+fn mirv_get_demo_tick(this: &JsValue, args: &[JsValue], _context: &mut Context) -> JsResult<JsValue> {
+    if let Some(object) = this.as_object() {
+        if let Some(mirv) = object.downcast_ref::<MirvStruct>() {
+            return Ok(JsValue::Integer(afx_get_demo_tick(mirv.iface)));
+        }
+    }
+    mirv_error_type()
+}
+
 fn mirv_is_playing_demo(this: &JsValue, args: &[JsValue], _context: &mut Context) -> JsResult<JsValue> {
     if let Some(object) = this.as_object() {
         if let Some(mirv) = object.downcast_ref::<MirvStruct>() {
@@ -1651,7 +1670,12 @@ impl AfxHookSource2Rs {
             NativeFunction::from_fn_ptr(mirv_is_handle_valid),
             js_string!("isHandleValid"),
             0,
-        )        
+        )
+        .function(
+            NativeFunction::from_fn_ptr(mirv_get_demo_tick),
+            js_string!("GetDemoTick"),
+            0,
+        )
         .function(
             NativeFunction::from_fn_ptr(mirv_is_playing_demo),
             js_string!("isPlayingDemo"),

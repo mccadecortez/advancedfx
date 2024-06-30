@@ -105,6 +105,15 @@ void afx_hook_source2_getEntityRefRenderEyeAngles(void * pRef, float & x, float 
 
 int afx_hook_source2_getEntityRefViewEntityHandle(void * pRef);
 
+int afx_hook_source2_getDemoTick() {
+    if(g_pEngineToClient) {
+		if(SOURCESDK::CS2::IDemoFile * pDemoPlayer = g_pEngineToClient->GetDemoFile()) {
+			return pDemoPlayer->GetDemoTick();
+        }
+    }
+    return -1;
+}
+
 bool afx_hook_source2_isPlayingDemo() {
     if(g_pEngineToClient) {
 		if(SOURCESDK::CS2::IDemoFile * pDemoPlayer = g_pEngineToClient->GetDemoFile()) {
@@ -203,6 +212,7 @@ struct AfxHookSource2 {
     &afx_hook_source2_getEntityRefRenderEyeOrigin,
     &afx_hook_source2_getEntityRefRenderEyeAngles,
     &afx_hook_source2_getEntityRefViewEntityHandle,
+    &afx_hook_source2_getDemoTick,
     &afx_hook_source2_isPlayingDemo,
     &afx_hook_source2_isDemoPaused
 };
