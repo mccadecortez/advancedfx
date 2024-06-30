@@ -39,6 +39,6 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: build-Release-lastest
-        path: build/Release
+        path: "${{github.workspace}}/build/Release"
         overwrite: true
         if-no-files-found: error
