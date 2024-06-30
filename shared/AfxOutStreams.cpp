@@ -12,6 +12,7 @@
 #include <string>
 #include <sstream>
 #include <iomanip>
+#include <chrono>
 
 #include <hlaeFolder.h>
 
