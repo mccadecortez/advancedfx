@@ -1673,7 +1673,7 @@ impl AfxHookSource2Rs {
         )
         .function(
             NativeFunction::from_fn_ptr(mirv_get_demo_tick),
-            js_string!("GetDemoTick"),
+            js_string!("getDemoTick"),
             0,
         )
         .function(
