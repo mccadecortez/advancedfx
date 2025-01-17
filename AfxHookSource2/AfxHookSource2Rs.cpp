@@ -138,6 +138,15 @@ extern "C" FFIBool afx_hook_source2_is_demo_paused() {
     return FFIBOOL_FALSE;
 }
 
+extern "C" int afx_hook_source2_get_demo_tick() {
+    if(g_pEngineToClient) {
+		if(SOURCESDK::CS2::IDemoFile * pDemoPlayer = g_pEngineToClient->GetDemoFile()) {
+			return pDemoPlayer->GetDemoTick();
+        }
+    }
+    return -1;
+}
+
 extern CamPath g_CamPath;
 
 extern "C" CamPath * afx_hook_source2_get_main_campath(void) {

@@ -12,6 +12,7 @@
 #include <string>
 #include <sstream>
 #include <iomanip>
+#include <chrono>
 
 #include <hlaeFolder.h>
 
@@ -76,7 +77,8 @@ bool COutImageStream::CreateCapturePath(const char* fileExtension, std::wstring&
 		return false;
 
 	std::wostringstream os;
-	os << m_Path << L"\\" << std::setfill(L'0') << std::setw(5) << m_FrameNumber << std::setw(0) << fileExtension;
+	const auto epoch = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+	os << m_Path << L"\\" << std::setfill(L'0') << std::setw(0) << epoch << "_" << std::setw(5) << m_FrameNumber << std::setw(0) << fileExtension;
 
 	outPath = os.str();
 

@@ -130,6 +130,8 @@ extern "C" {
 
     fn afx_hook_source2_is_demo_paused() -> bool;
 
+    fn afx_hook_source2_get_demo_tick() -> i32;
+
     fn afx_hook_source2_get_main_campath() -> * mut advancedfx::campath::CampathType;
 
     // can return nullptr to indicate no debug name.
@@ -940,6 +942,14 @@ fn afx_is_demo_paused() -> bool {
     let result: bool;
     unsafe {
         result = afx_hook_source2_is_demo_paused();
+    }
+    return result;
+}
+
+fn afx_get_demo_tick() -> i32 {
+    let result: i32;
+    unsafe {
+        result = afx_hook_source2_get_demo_tick();
     }
     return result;
 }
@@ -2190,6 +2200,10 @@ fn mirv_is_demo_paused(_this: &JsValue, _args: &[JsValue], _context: &mut Contex
    return Ok(JsValue::Boolean(afx_is_demo_paused()));
 }
 
+fn mirv_get_demo_tick(_this: &JsValue, _args: &[JsValue], _context: &mut Context) -> JsResult<JsValue> {
+    return Ok(JsValue::Integer(afx_get_demo_tick()));
+ }
+
 fn mirv_get_main_campath(this: &JsValue, _args: &[JsValue], context: &mut Context) -> JsResult<JsValue> {
     if let Some(object) = this.as_object() {
         if let Some(mut mirv) = object.downcast_mut::<MirvStruct>() {
@@ -2302,6 +2316,11 @@ impl AfxHookSource2Rs {
         .function(
             NativeFunction::from_fn_ptr(mirv_is_demo_paused),
             js_string!("isDemoPaused"),
+            0,
+        )
+        .function(
+            NativeFunction::from_fn_ptr(mirv_get_demo_tick),
+            js_string!("getDemoTick"),
             0,
         )
         .function(
