@@ -134,6 +134,8 @@ extern "C" {
 
     fn afx_hook_source2_get_main_campath() -> * mut advancedfx::campath::CampathType;
 
+    fn afx_hook_source2_get_world_to_screen_matrix() -> * mut [[f32; 4]; 4];
+
     // can return nullptr to indicate no debug name.
     fn afx_hook_source2_get_entity_ref_player_name(p_ref: * mut AfxEntityRef) -> *const c_char;
 
@@ -2227,6 +2229,32 @@ fn mirv_get_main_campath(this: &JsValue, _args: &[JsValue], context: &mut Contex
     Err(advancedfx::js::errors::error_type())
 }
 
+fn mirv_get_world_to_screen_matrix(this: &JsValue, _args: &[JsValue], context: &mut Context) -> JsResult<JsValue> {
+    if let Some(object) = this.as_object() {
+        if let Some(mut mirv) = object.downcast_mut::<MirvStruct>() {
+            let viewmatrix: [[f32; 4]; 4];
+            unsafe {
+                let viewmatrixptr = afx_hook_source2_get_world_to_screen_matrix();
+
+                viewmatrix = *viewmatrixptr;
+            }
+
+            let js_array = JsArray::from_iter(
+                [
+                    JsValue::Rational((viewmatrix[0][0]).into()), JsValue::Rational((viewmatrix[0][1]).into()), JsValue::Rational((viewmatrix[0][2]).into()), JsValue::Rational((viewmatrix[0][3]).into()),
+                    JsValue::Rational((viewmatrix[1][0]).into()), JsValue::Rational((viewmatrix[1][1]).into()), JsValue::Rational((viewmatrix[1][2]).into()), JsValue::Rational((viewmatrix[1][3]).into()),
+                    JsValue::Rational((viewmatrix[2][0]).into()), JsValue::Rational((viewmatrix[2][1]).into()), JsValue::Rational((viewmatrix[0][2]).into()), JsValue::Rational((viewmatrix[0][3]).into()),
+                    JsValue::Rational((viewmatrix[3][0]).into()), JsValue::Rational((viewmatrix[3][1]).into()), JsValue::Rational((viewmatrix[3][2]).into()), JsValue::Rational((viewmatrix[3][3]).into()),
+                ],
+                context
+            );
+
+            return Ok(JsValue::Object(JsObject::from(js_array)));
+        }
+    }
+    Err(advancedfx::js::errors::error_type())
+}
+
 impl AfxHookSource2Rs {
     pub fn new() -> Self {
 
@@ -2301,6 +2329,11 @@ impl AfxHookSource2Rs {
         .function(
             NativeFunction::from_fn_ptr(mirv_get_main_campath),
             js_string!("getMainCampath"),
+            0,
+        )
+        .function(
+            NativeFunction::from_fn_ptr(mirv_get_world_to_screen_matrix),
+            js_string!("getWorldToScreenMatrix"),
             0,
         )
         .function(

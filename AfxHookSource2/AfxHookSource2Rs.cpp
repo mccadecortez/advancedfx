@@ -153,6 +153,12 @@ extern "C" CamPath * afx_hook_source2_get_main_campath(void) {
     return &g_CamPath;
 }
 
+extern SOURCESDK::VMatrix g_WorldToScreenMatrix;
+
+extern "C" SOURCESDK::VMatrix * afx_hook_source2_get_world_to_screen_matrix(void) {
+    return &g_WorldToScreenMatrix;
+}
+
 typedef void AfxHookSource2Rs;
 
 AfxHookSource2Rs * g_AfxHookSource2Rs_Engine = nullptr;
