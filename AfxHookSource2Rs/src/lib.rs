@@ -13,6 +13,7 @@ use std::rc::Weak;
 use std::path::Path;
 use std::path::PathBuf;
 
+use boa_engine::builtins::array;
 use futures::SinkExt;
 use futures::StreamExt;
 use futures::stream::SplitSink;
@@ -2231,7 +2232,7 @@ fn mirv_get_main_campath(this: &JsValue, _args: &[JsValue], context: &mut Contex
 
 fn mirv_get_world_to_screen_matrix(this: &JsValue, _args: &[JsValue], context: &mut Context) -> JsResult<JsValue> {
     if let Some(object) = this.as_object() {
-        if let Some(mut mirv) = object.downcast_mut::<MirvStruct>() {
+        if let Some(_mirv) = object.downcast_mut::<MirvStruct>() {
             let viewmatrix: [[f32; 4]; 4];
             unsafe {
                 let viewmatrixptr = afx_hook_source2_get_world_to_screen_matrix();
@@ -2239,15 +2240,15 @@ fn mirv_get_world_to_screen_matrix(this: &JsValue, _args: &[JsValue], context: &
                 viewmatrix = *viewmatrixptr;
             }
 
-            let js_array = JsArray::from_iter(
-                [
-                    JsValue::Rational((viewmatrix[0][0]).into()), JsValue::Rational((viewmatrix[0][1]).into()), JsValue::Rational((viewmatrix[0][2]).into()), JsValue::Rational((viewmatrix[0][3]).into()),
-                    JsValue::Rational((viewmatrix[1][0]).into()), JsValue::Rational((viewmatrix[1][1]).into()), JsValue::Rational((viewmatrix[1][2]).into()), JsValue::Rational((viewmatrix[1][3]).into()),
-                    JsValue::Rational((viewmatrix[2][0]).into()), JsValue::Rational((viewmatrix[2][1]).into()), JsValue::Rational((viewmatrix[0][2]).into()), JsValue::Rational((viewmatrix[0][3]).into()),
-                    JsValue::Rational((viewmatrix[3][0]).into()), JsValue::Rational((viewmatrix[3][1]).into()), JsValue::Rational((viewmatrix[3][2]).into()), JsValue::Rational((viewmatrix[3][3]).into()),
-                ],
-                context
-            );
+            let js_array = JsArray::new(context);
+
+            for element in viewmatrix {
+                let array = JsArray::from_iter(element.iter().map(|x| JsValue::Rational((*x).into())), context);
+
+                if let Err(error) = js_array.push(array, context) {
+                    return Err(JsError::from_rust(error));
+                }
+            }
 
             return Ok(JsValue::Object(JsObject::from(js_array)));
         }
