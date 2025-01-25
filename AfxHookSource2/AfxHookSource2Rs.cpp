@@ -16,6 +16,8 @@
 #include <string>
 
 extern SOURCESDK::CS2::ISource2EngineToClient * g_pEngineToClient;
+extern float interpolation_amount_get(void);
+extern float interval_per_tick_get(void);
 
 extern "C" void afx_hook_source2_message(const char * pszValue) {
     advancedfx::Message("%s",pszValue);
@@ -145,6 +147,19 @@ extern "C" int afx_hook_source2_get_demo_tick() {
         }
     }
     return -1;
+}
+
+extern "C" float afx_hook_source2_get_demo_time() {
+    if(g_pEngineToClient) {
+		if(SOURCESDK::CS2::IDemoFile * pDemoPlayer = g_pEngineToClient->GetDemoFile()) {
+			int tick = pDemoPlayer->GetDemoTick();
+            float time = (tick + interpolation_amount_get())* interval_per_tick_get();
+
+            return time;
+        }
+    }
+
+    return -1.0;
 }
 
 extern CamPath g_CamPath;

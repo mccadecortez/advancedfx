@@ -133,6 +133,8 @@ extern "C" {
 
     fn afx_hook_source2_get_demo_tick() -> i32;
 
+    fn afx_hook_source2_get_demo_time() -> f32;
+
     fn afx_hook_source2_get_main_campath() -> * mut advancedfx::campath::CampathType;
 
     fn afx_hook_source2_get_world_to_screen_matrix() -> * mut [[f32; 4]; 4];
@@ -953,6 +955,14 @@ fn afx_get_demo_tick() -> i32 {
     let result: i32;
     unsafe {
         result = afx_hook_source2_get_demo_tick();
+    }
+    return result;
+}
+
+fn afx_get_demo_time() -> f32 {
+    let result: f32;
+    unsafe {
+        result = afx_hook_source2_get_demo_time();
     }
     return result;
 }
@@ -2205,7 +2215,11 @@ fn mirv_is_demo_paused(_this: &JsValue, _args: &[JsValue], _context: &mut Contex
 
 fn mirv_get_demo_tick(_this: &JsValue, _args: &[JsValue], _context: &mut Context) -> JsResult<JsValue> {
     return Ok(JsValue::Integer(afx_get_demo_tick()));
- }
+}
+
+fn mirv_get_demo_time(_this: &JsValue, _args: &[JsValue], _context: &mut Context) -> JsResult<JsValue> {
+    return Ok(JsValue::Rational(afx_get_demo_time().into()));
+}
 
 fn mirv_get_main_campath(this: &JsValue, _args: &[JsValue], context: &mut Context) -> JsResult<JsValue> {
     if let Some(object) = this.as_object() {
@@ -2355,6 +2369,11 @@ impl AfxHookSource2Rs {
         .function(
             NativeFunction::from_fn_ptr(mirv_get_demo_tick),
             js_string!("getDemoTick"),
+            0,
+        )
+        .function(
+            NativeFunction::from_fn_ptr(mirv_get_demo_time),
+            js_string!("getDemoTime"),
             0,
         )
         .function(
